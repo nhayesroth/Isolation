@@ -32,6 +32,7 @@ public class Play{
     /* variables that will change as the game runs */
     public static Node root = new Node(); // root node for each search
     public static char computer_char; // character for computer player
+    public static char player_char; // character for the human player
     public static char[][] board = new char[Node.puzzle_size][Node.puzzle_size]; //current board
     public static int time_limit; // time limit for moves
     public static char current_player; // indicates which player's turn it is
@@ -56,11 +57,11 @@ public class Play{
     
     /*
      * intro()
-     * welcomes the user and prompts the choosing of player type
-     * returns: char
+     * welcomes the user and prompts the choosing of player type, which sets each player
+     * returns: NA
      * args: NA
      */
-    public static char intro(){
+    public static void intro(){
         System.out.println("\nWelcome to Project 3 - Isolation. Prepare to lose, sucka!");
         try{
             Thread.sleep(1000);
@@ -76,10 +77,16 @@ public class Play{
             System.out.println("\nMake your selection by entering either x or o.");
             Scanner in = new Scanner(System.in);
             choice = in.next();
-            if (choice.charAt(0) == 'x')
-                return choice.charAt(0);
-            if (choice.charAt(0)  == 'o')
-                return choice.charAt(0); 
+            if (choice.charAt(0) == 'x'){
+                computer_char = 'x';
+                player_char = 'o';
+                return;
+            }
+            if (choice.charAt(0)  == 'o'){
+                computer_char = 'o';
+                player_char = 'x';
+                return;
+            }
         }
     }
     
@@ -107,12 +114,14 @@ public class Play{
                 current_move[count] = Integer.parseInt(m.group());
                 count++;
             }
-            System.out.println("Are you sure you want to move to (" + current_move[0] + ", " + current_move[1] + ")");
+            System.out.println("Are you sure you want to move to (" + 
+                               current_move[0] + ", " + 
+                               current_move[1] + ")?");
             String answer = yesNo();
             if (answer.equals("n"))
                 readPlayerMove();
             else
-                root.setState((current_move[0]-board_index),(current_move[1]-board_index),'G');
+                root.setState((current_move[0]-board_index),(current_move[1]-board_index),player_char);
         }
     }
 
@@ -133,7 +142,9 @@ public class Play{
                 System.out.println("Exception: " + e);
             }
             if (!(answer.equals("n")||answer.equals("y"))){
-                System.out.println("Sorry, that was a yes/no question." + "('y' to answer 'yes')\n\t" +"('n' to answer 'no')");
+                System.out.println("Sorry, that was a yes/no question." + 
+                                   "('y' to answer 'yes')\n\t" +
+                                   "('n' to answer 'no')");
             }
             else return answer;
         }
@@ -141,10 +152,30 @@ public class Play{
     
     /*
      * computerMove()
+     * administers the computer's move
+     * returns: 
+     * args: 
      */
     public static void computerMove(){
-        System.out.println("Pretend the computer makes its move.");
+        System.out.println("\nPretend the computer makes its move.");
     }
+
+    /*
+     * checkMoveValidity(char current_char, int[] move)
+     * checks whether the move entered is valid
+     * returns: boolean, true if valid, false otherwise
+     * args: char, int[]
+     */
+    public static boolean checkMoveValidity(char current_char, int[] move){
+        boolean validity = false;
+        return validity;
+    }
+
+    /*
+     * findChar(char toFind)
+     * finds the coordinates of the 
+
+
     
     /*
      * main function
@@ -153,7 +184,7 @@ public class Play{
     public static void main(String [] args){
         fillBoard();
         root.setState(board);
-        computer_char = intro();
+        intro();
         if (computer_char == 'x')
             computer_turn = true;
         else computer_turn = false;

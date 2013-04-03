@@ -133,13 +133,36 @@ public class Node implements Comparable{
     }
     
     /*
-     * setValidMoves()
+     * setValidMoves(char current_char)
      * sets the validMoves() Vector with appropriate values;
      * returns: NA
      * args: NA
      */
-    public void setValidMoves(){
-       System.out.println("setValidMoves not implemented yet");
+    public void setValidMoves(char current_char){
+        int[] coordinates = new int[2];
+        // find the char
+        for (int i = 0; i<puzzle_size; i++){
+            for (int j = 0; j<puzzle_size; j++){
+                if (this.state[i][j] == current_char){
+                    coordinates[0] = i;
+                    coordinates[1] = j;
+                }
+            }
+        }
+
+        // generate horizontal
+        for (int index = -coordinates[0]; index<puzzle_size; index++){
+            if (coordinates[0] != index)
+                this.validMoves.add(new Point(index, coordinates[1]));
+        }
+
+        // generate vertical
+        
+
+        // generate DL-UR
+        
+
+        // generate UL-DR
     } 
     
      
@@ -215,7 +238,20 @@ public class Node implements Comparable{
                 System.out.print(String.valueOf(this.state[i][j]) + " ");
         }
         System.out.println();
-    }    
+    }
+
+    /*
+     * checkMoveValidity(char current_char, int[] move)
+     * checks whether the move entered is valid
+     * returns: boolean, true if valid, false otherwise
+     * args: char, int[]
+     */
+    public static boolean checkMoveValidity(char current_char, int[] move){
+        boolean validity = false;
+
+        return validity;
+    }
+
      
     /*
      * printValidMoves()
