@@ -23,17 +23,20 @@ import java.io.*;
 
 public class Play{
     
-    /* variables */
-    static int[] x_start = {0,0};
-    static int[] o_start = {7,7};
+    /* variables that affect the base game */
+    static int[] x_start = {0,0}; // x's starting indeces (0 indexed)
+    static int[] o_start = {7,7}; // o's starting indeces (0 indexed)
+    static int board_index = 1; // how the user refers to to the first row/column
 
-    /* static variables */
-    public static Node root = new Node();    // root node for each search
-    public static char computer_char;    // character for computer player
+
+    /* variables that will change as the game runs */
+    public static Node root = new Node(); // root node for each search
+    public static char computer_char; // character for computer player
     public static char[][] board = new char[Node.puzzle_size][Node.puzzle_size]; //current board
-    public static int time_limit;    // time limit for moves
-    public static char current_player;    // indicates which player's turn it is
-    public static int[] current_move = new int[2];    // coordinates of current move
+    public static int time_limit; // time limit for moves
+    public static char current_player; // indicates which player's turn it is
+    public static int[] current_move = new int[2]; // coordinates of current move
+    public static boolean computer_turn; // indicates if it is the computer's turn to move
     
     /*
      * fillBoard(Point xStart, Point oStart)
@@ -108,6 +111,8 @@ public class Play{
             String answer = yesNo();
             if (answer.equals("n"))
                 readPlayerMove();
+            else
+                root.setState((current_move[0]-board_index),(current_move[1]-board_index),'G');
         }
     }
 
@@ -135,6 +140,13 @@ public class Play{
     }
     
     /*
+     * computerMove()
+     */
+    public static void computerMove(){
+        System.out.println("Pretend the computer makes its move.");
+    }
+    
+    /*
      * main function
      * administers the program
      */
@@ -142,11 +154,19 @@ public class Play{
         fillBoard();
         root.setState(board);
         computer_char = intro();
+        if (computer_char == 'x')
+            computer_turn = true;
+        else computer_turn = false;
         while(true){
-            readPlayerMove();
-            root.printState();
-            if ((current_move[0] == 0) && (current_move[1] == 0))
-                   break; 
+            if(computer_turn)
+                computerMove();
+            else{
+                readPlayerMove();
+                root.printState();
+                if ((current_move[0] == 0) && (current_move[1] == 0))
+                    break;
+            }
+            computer_turn = !computer_turn;
         }
         System.out.println();
     }
