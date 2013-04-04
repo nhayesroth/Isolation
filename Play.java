@@ -160,7 +160,7 @@ public class Play{
      * args: 
      */
     public static void computerMove(){
-        System.out.println("\nPretend the computer makes its move.");
+        System.out.println("\n\nPretend the computer makes its move.\n");
     }
 
     /*
@@ -198,6 +198,7 @@ public class Play{
                 System.out.println("Computer Moves:");
                 root.printValidMoves();
                 computerMove();
+                root.printState();
             }
             else{
                 root.setValidMoves(player_char);
