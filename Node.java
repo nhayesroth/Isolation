@@ -191,21 +191,24 @@ public class Node implements Comparable{
         if (coordinates[0] > coordinates[1])
             limit = coordinates[1];
         else limit = coordinates[0];
-        System.out.println("coordinates0: " + coordinates[0]);
-        System.out.println("coordinates1: " + coordinates[1]);
-        System.out.println("limit: " + limit);
-
-        for (int index = 1; index < limit; index++){
-            System.out.println("I'm about to die!!!!");
+        for (int index = 1; index <= limit; index++){
             if (this.state[coordinates[0]-index][coordinates[1]-index] == '-'){
                 this.validMoves.add(new Point((coordinates[0]-index), (coordinates[1]-index)));
-                System.out.println("DEBUG: up/left added");
             }
             else
                 break;
         }
         // up/right
-
+        if (coordinates[0] > puzzle_size - coordinates[1] - 1)
+            limit = puzzle_size - coordinates[1] - 1;
+        else limit = coordinates[0];
+        for (int index = 1; index <= limit; index++){
+            if (this.state[coordinates[0]-index][coordinates[1]+index] == '-'){
+                this.validMoves.add(new Point((coordinates[0]-index), (coordinates[1]+index)));
+            }
+            else
+                break;
+        }
         // down/left
 
         // down/right
