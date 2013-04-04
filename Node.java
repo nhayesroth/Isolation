@@ -340,7 +340,6 @@ public class Node implements Comparable{
      */
     public void printValidMoves(){
         Iterator itr = this.validMoves.iterator();
-        System.out.print("Next Spaces: ");
         while(itr.hasNext()){
             Point next = (Point)itr.next();
             System.out.print("(" + (int)next.getX() + " " + (int)next.getY()+")");

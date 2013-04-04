@@ -80,14 +80,24 @@ public class Play{
             if (choice.charAt(0) == 'x'){
                 computer_char = 'x';
                 player_char = 'o';
-                return;
+                break;
             }
             if (choice.charAt(0)  == 'o'){
                 computer_char = 'o';
                 player_char = 'x';
-                return;
+                break;
             }
         }
+        System.out.println("\nAlright, and how many seconds should it spend making each move?");
+        int time_limit;
+        try {
+            BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+            choice = br.readLine();
+        } catch (Exception e) {
+            System.out.println("Exception: " + e);
+        }
+        time_limit = Integer.parseInt(choice);
+        System.out.println("\nGot it, each move will take, at most, "+time_limit+" seconds.\n");
     }
     
     /*
@@ -167,6 +177,7 @@ public class Play{
      * args: 
      */
     public static void computerMove(){
+        long start_
         System.out.println("\n\nPretend the computer makes its move.\n");
     }
 
