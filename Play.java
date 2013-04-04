@@ -43,7 +43,7 @@ public class Play{
     public static boolean computer_turn; // indicates if it is the computer's turn to move
     static int[] best_move = new int[2]; // will hold the best move for the computer
     static Vector<Node> children = new Vector<Node>(); // will hold root successors
-    static int depth = 6;
+    static int depth;
     
     /*
      * fillBoard(Point xStart, Point oStart)
@@ -103,27 +103,12 @@ public class Play{
             System.out.println("Exception: " + e);
         }
         time_limit = Integer.parseInt(choice);
-        applyTimeLimit();
-        System.out.println("\nGot it, each move will take, at most, "+time_limit+" seconds.\n");
-    }
-
-    /*
-     * applyTimeLimit()
-     */
-    public static void applyTimeLimit(){
-        if (time_limit>50){
-            depth = 6;
-            return;
-        }
-        if (time_limit>40){
+        if(time_limit>50)
             depth = 5;
-            return;
-        }
-        if (time_limit>30){
-            depth = 4;
-            return;
-        }
-        else depth = 3;
+        else depth = 4;
+        System.out.println("DEPTH: " + depth);        
+        System.out.println("TIME_LIMIT: " + time_limit);        
+        System.out.println("\nGot it, each move will take, at most, "+time_limit+" seconds.\n");
     }
     
     /*
@@ -204,19 +189,24 @@ public class Play{
      */
     public static void computerMove(){
         children.clear();
-        int score = alphaBetaSearch(root, 6);
+        int score = alphaBetaSearch(root, depth);
         if (children.size() == 0){
             System.out.println("(nil nil)");
             System.exit(0);
         }
         System.out.println("\n\nAlpha-Beta Score: " + score);
         Iterator itr = children.iterator();
+        System.out.println("DEBUG: done searching, about to check all successors...");
         while(itr.hasNext()){
             Node child = (Node)itr.next();
-            if (child.value == score)
+            System.out.print("\nDEBUG: successor: (" + child.findChar(computer_char)[0] + " " + child.findChar(computer_char)[1] + ")");
+            System.out.print("-- score: child.value " + child.value);
+            if (child.value == score){
                 best_move = child.findChar(computer_char);
+                break;
+            }
         }
-        System.out.println("Move: (" + best_move[0] + " " + best_move[1] + ")");
+        System.out.println("\n\nMove: (" + (best_move[0]+board_index) + " " + (best_move[1]+board_index) + ")");
         int[] old_coord = root.findChar(computer_char);
         board[best_move[0]][best_move[1]] = computer_char;
         board[old_coord[0]][old_coord[1]] = '*';
@@ -258,6 +248,14 @@ public class Play{
             }
             alpha = Math.max(alpha, value);
         }
+        itr = children.iterator();
+        while(itr.hasNext()){
+            Node current = (Node)itr.next();
+
+            int[] coord = current.findChar(node.getTurn());
+            System.out.println("NEW DEBUG ("+coord[0]+" "+coord[1]+")");
+        }
+
         return value;
     }
 
