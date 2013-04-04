@@ -27,6 +27,7 @@ public class Node implements Comparable{
     private char turn;
     private int depth;
     public Vector<Point> validMoves;
+    public int value;
 
     /*
      * initial constructor
@@ -39,6 +40,7 @@ public class Node implements Comparable{
         this.turn = 'x';
         this.depth = 0;
         this.validMoves = new Vector<Point>();
+        this.value = 0;
     }
     
     /* 
@@ -63,6 +65,7 @@ public class Node implements Comparable{
             this.turn = 'x';
         this.depth = parent.depth + 1;
         this.validMoves = this.setValidMoves();
+        this.value = 0;
     }
     
     /*
@@ -333,8 +336,10 @@ public class Node implements Comparable{
      * args: NA
      */
     public void printState(){
+        System.out.print("  1 2 3 4 5 6 7 8");
         for (int i = 0; i<puzzle_size; i++){
             System.out.println();
+            System.out.print(i+1 + " ");
             for (int j = 0; j<puzzle_size; j++)
                 System.out.print(String.valueOf(this.state[i][j]) + " ");
         }
@@ -363,31 +368,8 @@ public class Node implements Comparable{
      * args: NA
      */
     public int evaluate(){
-        return this.validMoves.size();
-    }
-
-    /*
-     * isMax()
-     * returns true if the current node is a max Node
-     * returns: boolean
-     * args: NA
-     */
-    public boolean isMax(){
-        if (this.turn == Play.computer_char)
-            return true;
-        else return false;
-    }
-
-    /*
-     * isMin()
-     * returns true if the current node is a min Node
-     * returns: boolean
-     * args: NA
-     */
-    public boolean isMin(){
-        if (this.turn == Play.player_char)
-            return true;
-        else return false;
+        this.value = this.validMoves.size();
+        return this.value;
     }
 
 }

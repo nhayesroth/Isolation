@@ -182,8 +182,16 @@ public class Play{
      * args: 
      */
     public static void computerMove(){
+        children.clear();
         long start_time;
-        System.out.println("\n\nAlpha-Beta Score: " + alphaBetaSearch(root, 3));
+        int score = alphaBetaSearch(root, 3);
+        System.out.println("\n\nAlpha-Beta Score: " + score);
+        Iterator itr = children.iterator();
+        while(itr.hasNext()){
+            Node child = (Node)itr.next();
+            if (child.value == score)
+                best_move = child.findChar(computer_char);
+        }
         System.out.println("Move: (" + best_move[0] + " " + best_move[1] + ")");
         int[] old_coord = root.findChar(computer_char);
         board[best_move[0]][best_move[1]] = computer_char;
@@ -208,7 +216,7 @@ public class Play{
      */
     public static int maxValue(Node node, int alpha, int beta, int depth_limit){
         if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0){
-            best_move = node.findChar(node.getTurn());
+            //best_move = node.findChar(node.getTurn());
             return node.evaluate();
         }
         
@@ -217,9 +225,12 @@ public class Play{
         while(itr.hasNext()){
             Point move = (Point)itr.next();
             Node child = new Node(node, move, node.getTurn());
+            children.add(child);
+            System.out.println("DEBUG - child ("+(int)move.getX()+" "+(int)move.getY()+")");
             value = Math.max(value, minValue(child, alpha, beta, depth_limit));
+            child.value = value;
             if (value >= beta){
-                best_move = node.findChar(node.getTurn());
+                //best_move = node.findChar(node.getTurn());
                 return value;
             }
             alpha = Math.max(alpha, value);
@@ -232,7 +243,7 @@ public class Play{
      */
     public static int minValue(Node node, int alpha, int beta, int depth_limit){
         if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0){
-            best_move = node.findChar(node.getTurn());
+            //best_move = node.findChar(node.getTurn());
             return node.evaluate();
         }
         int value = infinity;
@@ -241,8 +252,9 @@ public class Play{
             Point move = (Point)itr.next();
             Node child = new Node(node, move, node.getTurn());
             value = Math.min(value, minValue(child, alpha, beta, depth_limit));
+            child.value = value;
             if (value >= beta){
-                best_move = node.findChar(node.getTurn());
+                //best_move = node.findChar(node.getTurn());
                 return value;
             }
             alpha = Math.min(beta, value);
