@@ -160,7 +160,6 @@ public class Node implements Comparable{
         int [] coordinates = findChar(current_char); // location of current player's character
         /* explore in all directions, adding moves as far as you can */
         // up
-        /*
         for (int index = coordinates[0] + 1; index < puzzle_size; index++){
             if (this.state[index][coordinates[1]] == '-')
                 this.validMoves.add(new Point(index, coordinates[1]));
@@ -210,14 +209,11 @@ public class Node implements Comparable{
             else
                 break;
         }
-        */
+        
         // down/left
         if (puzzle_size - coordinates[0] - 1 < coordinates[1])
             limit = puzzle_size - coordinates[0] - 1;
         else limit = coordinates[1];
-        System.out.println("DEBUG -- c[0]: " + coordinates[0]);
-        System.out.println("DEBUG -- c[1]: " + coordinates[1]);
-        System.out.println("DEBUG -- limit: " + limit);
         for (int index = 1; index <= limit; index++){
             if (this.state[coordinates[0]+index][coordinates[1]-index] == '-'){
                 this.validMoves.add(new Point((coordinates[0]+index), (coordinates[1]-index)));
@@ -226,7 +222,16 @@ public class Node implements Comparable{
                 break;
         }
         // down/right
-
+        if (puzzle_size - coordinates[0] - 1 < puzzle_size - coordinates[1] - 1)
+            limit = puzzle_size - coordinates[0] - 1;
+        else limit = puzzle_size - coordinates[1] - 1;
+        for (int index = 1; index <= limit; index++){
+            if (this.state[coordinates[0]+index][coordinates[1]+index] == '-'){
+                this.validMoves.add(new Point((coordinates[0]+index), (coordinates[1]+index)));
+            }
+            else
+                break;
+        }
     }
 
    /*
