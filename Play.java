@@ -43,6 +43,7 @@ public class Play{
     public static boolean computer_turn; // indicates if it is the computer's turn to move
     static int[] best_move = new int[2]; // will hold the best move for the computer
     static Vector<Node> children = new Vector<Node>(); // will hold root successors
+    static int depth = 6;
     
     /*
      * fillBoard(Point xStart, Point oStart)
@@ -102,7 +103,27 @@ public class Play{
             System.out.println("Exception: " + e);
         }
         time_limit = Integer.parseInt(choice);
+        applyTimeLimit();
         System.out.println("\nGot it, each move will take, at most, "+time_limit+" seconds.\n");
+    }
+
+    /*
+     * applyTimeLimit()
+     */
+    public static void applyTimeLimit(){
+        if (time_limit>50){
+            depth = 6;
+            return;
+        }
+        if (time_limit>40){
+            depth = 5;
+            return;
+        }
+        if (time_limit>30){
+            depth = 4;
+            return;
+        }
+        else depth = 3;
     }
     
     /*
@@ -178,13 +199,16 @@ public class Play{
     /*
      * computerMove()
      * administers the computer's move
-     * returns: 
-     * args: 
+     * returns: NA 
+     * args: NA
      */
     public static void computerMove(){
         children.clear();
-        long start_time;
-        int score = alphaBetaSearch(root, 3);
+        int score = alphaBetaSearch(root, 6);
+        if (children.size() == 0){
+            System.out.println("(nil nil)");
+            System.exit(0);
+        }
         System.out.println("\n\nAlpha-Beta Score: " + score);
         Iterator itr = children.iterator();
         while(itr.hasNext()){
@@ -196,7 +220,6 @@ public class Play{
         int[] old_coord = root.findChar(computer_char);
         board[best_move[0]][best_move[1]] = computer_char;
         board[old_coord[0]][old_coord[1]] = '*';
-
     }
 
     /*
@@ -277,10 +300,7 @@ public class Play{
             root.clearValidMoves();
             if(computer_turn){
                 root.setTurn(computer_char);
-                System.out.println("DEBUG: turn " + root.getTurn());
                 root.validMoves = root.setValidMoves();
-                System.out.println("DEBUG: allowable moves");
-                root.printValidMoves();
                 //root.setValidMoves(computer_char);
                 computerMove();
                 root.setState(board);

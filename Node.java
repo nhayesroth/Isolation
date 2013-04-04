@@ -368,8 +368,120 @@ public class Node implements Comparable{
      * args: NA
      */
     public int evaluate(){
-        this.value = this.validMoves.size();
+        char that_char = 'x';
+        if (this.turn == 'x')
+            that_char = 'o';
+        int this_row = this.findChar(this.turn)[0];
+        int that_row = this.findChar(that_char)[0];
+        int this_col = this.findChar(this.turn)[1];
+        int that_col = this.findChar(that_char)[1];
+        // start with 2 times the number of valid moves
+        int score = 2*this.validMoves.size();
+        //subtract the number of opponent's valid moves
+        score = score - this.opponentValidMoves(that_char);
+        // subtract 1 for each wall it's next to
+        if (this.findChar(this.turn)[0] == 0 || this.findChar(this.turn)[0] == puzzle_size-1)
+            score--;
+        // subtract 1 for each surrounding cell that is filled
+        for (int i = -1; i<=1; i++){
+            for (int j = -1; j<1; j++){
+                if (i>=0 && i<=puzzle_size-1 && j>=0 && j<=puzzle_size-1){
+                    if (this.state[i][j] != '-')
+                        score--;
+                }
+            }
+        }
+        // add 3 for each filled cell surrounding the oponent's char
+
+        this.value = score;
         return this.value;
+    }
+
+    /*
+     * opponentValidMoves(char that_char)
+     * gives the the number of oppenent validMoves;
+     * returns: NA
+     * args: NA
+     */
+    public int opponentValidMoves(char that_char){
+        int limit; // to be used in diagonals
+        Vector<Point> valid_moves = new Vector<Point>();
+        int [] coordinates = findChar(that_char); // location of current player's character
+        /* explore in all directions, adding moves as far as you can */
+        // up
+        for (int index = coordinates[0] + 1; index < puzzle_size; index++){
+            if (this.state[index][coordinates[1]] == '-')
+                valid_moves.add(new Point(index, coordinates[1]));
+            else
+                break;
+        }
+        // down
+        for (int index = coordinates[0] - 1; index >= 0; index--){
+            if (this.state[index][coordinates[1]] == '-')
+                valid_moves.add(new Point(index, coordinates[1]));
+            else
+                break;
+        }
+        // left
+        for (int index = coordinates[1] + 1; index < puzzle_size; index++){
+            if (this.state[coordinates[0]][index] == '-')
+                valid_moves.add(new Point(coordinates[0], index));
+            else
+                break;
+        }
+        // right
+        for (int index = coordinates[1] - 1; index >= 0; index--){
+            if (this.state[coordinates[0]][index] == '-')
+                valid_moves.add(new Point(coordinates[0], index));
+            else
+                break;
+        }
+        // up/left
+        if (coordinates[0] > coordinates[1])
+            limit = coordinates[1];
+        else limit = coordinates[0];
+        for (int index = 1; index <= limit; index++){
+            if (this.state[coordinates[0]-index][coordinates[1]-index] == '-'){
+                valid_moves.add(new Point((coordinates[0]-index), (coordinates[1]-index)));
+            }
+            else
+                break;
+        }
+        // up/right
+        if (coordinates[0] > puzzle_size - coordinates[1] - 1)
+            limit = puzzle_size - coordinates[1] - 1;
+        else limit = coordinates[0];
+        for (int index = 1; index <= limit; index++){
+            if (this.state[coordinates[0]-index][coordinates[1]+index] == '-'){
+                valid_moves.add(new Point((coordinates[0]-index), (coordinates[1]+index)));
+            }
+            else
+                break;
+        }
+        
+        // down/left
+        if (puzzle_size - coordinates[0] - 1 < coordinates[1])
+            limit = puzzle_size - coordinates[0] - 1;
+        else limit = coordinates[1];
+        for (int index = 1; index <= limit; index++){
+            if (this.state[coordinates[0]+index][coordinates[1]-index] == '-'){
+                valid_moves.add(new Point((coordinates[0]+index), (coordinates[1]-index)));
+            }
+            else
+                break;
+        }
+        // down/right
+        if (puzzle_size - coordinates[0] - 1 < puzzle_size - coordinates[1] - 1)
+            limit = puzzle_size - coordinates[0] - 1;
+        else limit = puzzle_size - coordinates[1] - 1;
+        for (int index = 1; index <= limit; index++){
+            if (this.state[coordinates[0]+index][coordinates[1]+index] == '-'){
+                valid_moves.add(new Point((coordinates[0]+index), (coordinates[1]+index)));
+            }
+            else
+                break;
+        }
+        return valid_moves.size();
     }
 
 }
