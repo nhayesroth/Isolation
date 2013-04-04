@@ -146,6 +146,16 @@ public class Node implements Comparable{
     }
 
     /*
+     * setTurn(char t)
+     * assigns the turn t to the current node
+     * returns: NA
+     * args: char
+     */
+    public void setTurn(char t){
+        this.turn = t;
+    }
+
+    /*
      * setDepth(int d)
      * assigns the depth d to the current node
      * returns: NA
@@ -186,12 +196,8 @@ public class Node implements Comparable{
         }
         // down
         for (int index = coordinates[0] - 1; index >= 0; index--){
-            if (this.state[index][coordinates[1]] == '-'){
-
-        System.out.println("DEBUG: before");
+            if (this.state[index][coordinates[1]] == '-')
                 valid_moves.add(new Point(index, coordinates[1]));
-        System.out.println("DEBUG: after");
-            }
             else
                 break;
         }

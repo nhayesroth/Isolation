@@ -41,7 +41,8 @@ public class Play{
     public static char current_player; // indicates which player's turn it is
     public static int[] current_move = new int[2]; // coordinates of current move
     public static boolean computer_turn; // indicates if it is the computer's turn to move
-    static int[] best_move = new int[2];
+    static int[] best_move = new int[2]; // will hold the best move for the computer
+    static Vector<Node> children = new Vector<Node>(); // will hold root successors
     
     /*
      * fillBoard(Point xStart, Point oStart)
@@ -183,6 +184,11 @@ public class Play{
     public static void computerMove(){
         long start_time;
         System.out.println("\n\nAlpha-Beta Score: " + alphaBetaSearch(root, 3));
+        System.out.println("Move: (" + best_move[0] + " " + best_move[1] + ")");
+        int[] old_coord = root.findChar(computer_char);
+        board[best_move[0]][best_move[1]] = computer_char;
+        board[old_coord[0]][old_coord[1]] = '*';
+
     }
 
     /*
@@ -193,7 +199,6 @@ public class Play{
      * args: Node, char, char
      */
     public static int alphaBetaSearch(Node root, int depth_limit){
-        System.out.println("DEBUG: in alphabeta");
         int score = maxValue(root, neg_infinity, infinity, depth_limit);
         return score;
     }
@@ -202,21 +207,21 @@ public class Play{
      * maxValue(Node node, int alpha, int beta, int depth_limit)
      */
     public static int maxValue(Node node, int alpha, int beta, int depth_limit){
-        if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0)
+        if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0){
+            best_move = node.findChar(node.getTurn());
             return node.evaluate();
+        }
         
-        System.out.println("DEBUG: finished terminal check");
         int value = neg_infinity;
         Iterator itr = node.getValidMoves().iterator();
         while(itr.hasNext()){
-        System.out.println("DEBUG: iterating");
             Point move = (Point)itr.next();
-
-        System.out.println("DEBUG: Point: (" + (int)move.getX() + " " + (int)move.getY() + ")");
             Node child = new Node(node, move, node.getTurn());
             value = Math.max(value, minValue(child, alpha, beta, depth_limit));
-            if (value >= beta)
+            if (value >= beta){
+                best_move = node.findChar(node.getTurn());
                 return value;
+            }
             alpha = Math.max(alpha, value);
         }
         return value;
@@ -226,24 +231,24 @@ public class Play{
      * minValue(Node node, int alpha, int beta, int depth_limit)
      */
     public static int minValue(Node node, int alpha, int beta, int depth_limit){
-         if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0)
+        if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0){
+            best_move = node.findChar(node.getTurn());
             return node.evaluate();
-         int value = infinity;
+        }
+        int value = infinity;
         Iterator itr = node.getValidMoves().iterator();
         while(itr.hasNext()){
             Point move = (Point)itr.next();
             Node child = new Node(node, move, node.getTurn());
             value = Math.min(value, minValue(child, alpha, beta, depth_limit));
-            if (value >= beta)
+            if (value >= beta){
+                best_move = node.findChar(node.getTurn());
                 return value;
+            }
             alpha = Math.min(beta, value);
         }
         return value;
     }
-
-
-
-
     
     /*
      * main function
@@ -259,14 +264,19 @@ public class Play{
         while(true){
             root.clearValidMoves();
             if(computer_turn){
+                root.setTurn(computer_char);
+                System.out.println("DEBUG: turn " + root.getTurn());
                 root.validMoves = root.setValidMoves();
+                System.out.println("DEBUG: allowable moves");
+                root.printValidMoves();
                 //root.setValidMoves(computer_char);
                 computerMove();
-                root.printState();
                 root.setState(board);
+                root.printState();
             }
             else{
                 //root.setValidMoves(player_char);
+                root.setTurn(player_char);
                 root.validMoves = root.setValidMoves();
                 readPlayerMove();
                 root.printState();
