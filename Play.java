@@ -19,6 +19,7 @@ import java.util.Scanner;
 import java.util.regex.Pattern;
 import java.util.regex.Matcher;
 import java.lang.String;
+import java.util.Iterator;
 import java.io.*;
 
 public class Play{
@@ -27,6 +28,8 @@ public class Play{
     static int[] x_start = {0,0}; // x's starting indeces (0 indexed)
     static int[] o_start = {7,7}; // o's starting indeces (0 indexed)
     static int board_index = 1; // how the user refers to to the first row/column
+    static int infinity = 9999;
+    static int neg_infinity = -9999; // to be used in alpha-beta
 
 
     /* variables that will change as the game runs */
@@ -38,6 +41,7 @@ public class Play{
     public static char current_player; // indicates which player's turn it is
     public static int[] current_move = new int[2]; // coordinates of current move
     public static boolean computer_turn; // indicates if it is the computer's turn to move
+    static int[] best_move = new int[2];
     
     /*
      * fillBoard(Point xStart, Point oStart)
@@ -177,9 +181,62 @@ public class Play{
      * args: 
      */
     public static void computerMove(){
-        long start_
+        long start_time;
         System.out.println("\n\nPretend the computer makes its move.\n");
     }
+
+    /*
+     * alphaBetaSearch(Node root, int alpha, int beta)
+     * returns the best move for the root Node
+     * based on the alpha-beta search algorithm
+     * returns: int[]
+     * args: Node, char, char
+     */
+    public static int alphaBetaSearch(Node root, int depth_limit){
+        int score = maxValue(root, neg_infinity, infinity, depth_limit);
+        return score;
+    }
+
+    /*
+     * maxValue(Node node, int alpha, int beta, int depth_limit)
+     */
+    public static int maxValue(Node node, int alpha, int beta, int depth_limit){
+        if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0)
+            return node.evaluate();
+        int value = neg_infinity;
+        Iterator itr = node.getValidMoves().iterator();
+        while(itr.hasNext()){
+            Point move = (Point)itr.next();
+            Node child = new Node(node, move, node.getTurn());
+            value = Math.max(value, minValue(child, alpha, beta, depth_limit));
+            if (value >= beta)
+                return value;
+            alpha = Math.max(alpha, value);
+        }
+        return value;
+    }
+
+    /*
+     * minValue(Node node, int alpha, int beta, int depth_limit)
+     */
+    public static int minValue(Node node, int alpha, int beta, int depth_limit){
+         if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0)
+            return node.evaluate();
+         int value = infinity;
+        Iterator itr = node.getValidMoves().iterator();
+        while(itr.hasNext()){
+            Point move = (Point)itr.next();
+            Node child = new Node(node, move, node.getTurn());
+            value = Math.min(value, minValue(child, alpha, beta, depth_limit));
+            if (value >= beta)
+                return value;
+            alpha = Math.min(beta, value);
+        }
+        return value;
+    }
+
+
+
 
     
     /*
@@ -197,15 +254,12 @@ public class Play{
             root.clearValidMoves();
             if(computer_turn){
                 root.setValidMoves(computer_char);
-                System.out.println("Computer Moves:");
-                root.printValidMoves();
                 computerMove();
                 root.printState();
+                root.setState(board);
             }
             else{
                 root.setValidMoves(player_char);
-                System.out.println("Player Moves:");
-                root.printValidMoves();
                 readPlayerMove();
                 root.printState();
                 if ((current_move[0] == 0) && (current_move[1] == 0))

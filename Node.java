@@ -46,16 +46,18 @@ public class Node implements Comparable{
      * returns: Node
      * args: Node, Point, Player
      */
-    public Node(Node parent, Point moveTo, char val){
+    public Node(Node parent, Point move_to, char val){
         this.parent = parent;
         this.state = parent.state;
-        this.setState((int)moveTo.getX(), (int)moveTo.getY(), val);
-        if (parent.turn == 'x')
+        int [] old_coordinates = this.findChar(val);
+        this.setState((int)move_to.getX(), (int)move_to.getY(), val);
+        this.setState(old_coordinates[0], old_coordinates[1], '*');
+        if (val == 'x')
             this.turn = 'o';
         else 
             this.turn = 'x';
         this.depth = parent.depth + 1;
-        this.validMoves = this.getValidMoves();
+        this.setValidMoves(this.turn);
     }
     
     /*
@@ -76,6 +78,16 @@ public class Node implements Comparable{
      */
     public char[][] getState(){
         return this.state;
+    }
+
+    /* 
+     * getTurn() 
+     * returns this node's turn
+     * returns: char
+     * args: NA
+     */
+    public char getTurn(){
+        return this.turn;
     }
 
     /*
@@ -252,35 +264,16 @@ public class Node implements Comparable{
             }
         }
         return coordinates;
-    }
-
-
-    
+    } 
      
     /*
-     * buildNextNode(Point newSpace)
+     * generateSuccessor(Point newSpace)
      * builds a child node 
      * returns: 
      * args: 
      */
-    public static Node buildNextNode(Node Parent, Point newSpace){
-        System.out.println("buildNextNode in progress");
-        //start with a blank node
-        Node child = new Node();
-        
-        //point its parent to the root node
-        child.parent = Parent;
-        
-        //copy the parent's state
-                
-        //add 1 to the depth
-        child.depth = Parent.depth + 1;
-        
-        //find value in position of newSpace, replace with zero
-               
-        // find previous space, replace with value
-                
-        return child;
+    public static void generateChildren(){
+        System.out.println("Iterate across validMoves and construct new Node for each.");
     }
    
     /* 
@@ -345,4 +338,39 @@ public class Node implements Comparable{
             System.out.print("(" + (int)next.getX() + " " + (int)next.getY()+")");
         }
     }
+
+    /*
+     * evaluate()
+     * evaluates the utility of a Node
+     * returns: int
+     * args: NA
+     */
+    public int evaluate(){
+        return this.validMoves.size();
+    }
+
+    /*
+     * isMax()
+     * returns true if the current node is a max Node
+     * returns: boolean
+     * args: NA
+     */
+    public boolean isMax(){
+        if (this.turn == Play.computer_char)
+            return true;
+        else return false;
+    }
+
+    /*
+     * isMin()
+     * returns true if the current node is a min Node
+     * returns: boolean
+     * args: NA
+     */
+    public boolean isMin(){
+        if (this.turn == Play.player_char)
+            return true;
+        else return false;
+    }
+
 }
