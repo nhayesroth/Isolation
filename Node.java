@@ -26,7 +26,7 @@ public class Node implements Comparable{
     private char[][] state;
     private char turn;
     private int depth;
-    private Vector<Point> validMoves;
+    public Vector<Point> validMoves;
 
     /*
      * initial constructor
@@ -48,7 +48,12 @@ public class Node implements Comparable{
      */
     public Node(Node parent, Point move_to, char val){
         this.parent = parent;
-        this.state = parent.state;
+        //this.state = parent.state;
+        this.state = new char[puzzle_size][puzzle_size];
+        for (int i = 0; i<puzzle_size; i++){
+            for (int j = 0; j<puzzle_size; j++)
+                this.state[i][j] = parent.state[i][j];
+        }
         int [] old_coordinates = this.findChar(val);
         this.setState((int)move_to.getX(), (int)move_to.getY(), val);
         this.setState(old_coordinates[0], old_coordinates[1], '*');
@@ -57,7 +62,7 @@ public class Node implements Comparable{
         else 
             this.turn = 'x';
         this.depth = parent.depth + 1;
-        this.setValidMoves(this.turn);
+        this.validMoves = this.setValidMoves();
     }
     
     /*
@@ -167,35 +172,40 @@ public class Node implements Comparable{
      * returns: NA
      * args: NA
      */
-    public void setValidMoves(char current_char){
+    public Vector<Point> setValidMoves(){
         int limit; // to be used in diagonals
-        int [] coordinates = findChar(current_char); // location of current player's character
+        Vector<Point> valid_moves = new Vector<Point>();
+        int [] coordinates = findChar(this.turn); // location of current player's character
         /* explore in all directions, adding moves as far as you can */
         // up
         for (int index = coordinates[0] + 1; index < puzzle_size; index++){
             if (this.state[index][coordinates[1]] == '-')
-                this.validMoves.add(new Point(index, coordinates[1]));
+                valid_moves.add(new Point(index, coordinates[1]));
             else
                 break;
         }
         // down
         for (int index = coordinates[0] - 1; index >= 0; index--){
-            if (this.state[index][coordinates[1]] == '-')
-                this.validMoves.add(new Point(index, coordinates[1]));
+            if (this.state[index][coordinates[1]] == '-'){
+
+        System.out.println("DEBUG: before");
+                valid_moves.add(new Point(index, coordinates[1]));
+        System.out.println("DEBUG: after");
+            }
             else
                 break;
         }
         // left
         for (int index = coordinates[1] + 1; index < puzzle_size; index++){
             if (this.state[coordinates[0]][index] == '-')
-                this.validMoves.add(new Point(coordinates[0], index));
+                valid_moves.add(new Point(coordinates[0], index));
             else
                 break;
         }
         // right
         for (int index = coordinates[1] - 1; index >= 0; index--){
             if (this.state[coordinates[0]][index] == '-')
-                this.validMoves.add(new Point(coordinates[0], index));
+                valid_moves.add(new Point(coordinates[0], index));
             else
                 break;
         }
@@ -205,7 +215,7 @@ public class Node implements Comparable{
         else limit = coordinates[0];
         for (int index = 1; index <= limit; index++){
             if (this.state[coordinates[0]-index][coordinates[1]-index] == '-'){
-                this.validMoves.add(new Point((coordinates[0]-index), (coordinates[1]-index)));
+                valid_moves.add(new Point((coordinates[0]-index), (coordinates[1]-index)));
             }
             else
                 break;
@@ -216,7 +226,7 @@ public class Node implements Comparable{
         else limit = coordinates[0];
         for (int index = 1; index <= limit; index++){
             if (this.state[coordinates[0]-index][coordinates[1]+index] == '-'){
-                this.validMoves.add(new Point((coordinates[0]-index), (coordinates[1]+index)));
+                valid_moves.add(new Point((coordinates[0]-index), (coordinates[1]+index)));
             }
             else
                 break;
@@ -228,7 +238,7 @@ public class Node implements Comparable{
         else limit = coordinates[1];
         for (int index = 1; index <= limit; index++){
             if (this.state[coordinates[0]+index][coordinates[1]-index] == '-'){
-                this.validMoves.add(new Point((coordinates[0]+index), (coordinates[1]-index)));
+                valid_moves.add(new Point((coordinates[0]+index), (coordinates[1]-index)));
             }
             else
                 break;
@@ -239,11 +249,12 @@ public class Node implements Comparable{
         else limit = puzzle_size - coordinates[1] - 1;
         for (int index = 1; index <= limit; index++){
             if (this.state[coordinates[0]+index][coordinates[1]+index] == '-'){
-                this.validMoves.add(new Point((coordinates[0]+index), (coordinates[1]+index)));
+                valid_moves.add(new Point((coordinates[0]+index), (coordinates[1]+index)));
             }
             else
                 break;
         }
+        return valid_moves;
     }
 
    /*

@@ -259,13 +259,15 @@ public class Play{
         while(true){
             root.clearValidMoves();
             if(computer_turn){
-                root.setValidMoves(computer_char);
+                root.validMoves = root.setValidMoves();
+                //root.setValidMoves(computer_char);
                 computerMove();
                 root.printState();
                 root.setState(board);
             }
             else{
-                root.setValidMoves(player_char);
+                //root.setValidMoves(player_char);
+                root.validMoves = root.setValidMoves();
                 readPlayerMove();
                 root.printState();
                 if ((current_move[0] == 0) && (current_move[1] == 0))
