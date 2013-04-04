@@ -122,8 +122,15 @@ public class Play{
             if (answer.equals("n"))
                 readPlayerMove();
             else{
-                root.setState((current_move[0]-board_index),(current_move[1]-board_index),player_char);
-                root.setState(coordinates[0], coordinates[1], '*'); 
+                Point to_check = new Point(current_move[0]-board_index, current_move[1]-board_index);
+                if (root.getValidMoves().contains(to_check)){
+                    root.setState((current_move[0]-board_index),(current_move[1]-board_index),player_char);
+                    root.setState(coordinates[0], coordinates[1], '*');
+                }
+                else {
+                   System.out.println("\nSorry, but that's an invalid move. I told you I'd win, sucka.\n");
+                   System.exit(0);
+                } 
             }
         }
     }
@@ -162,22 +169,6 @@ public class Play{
     public static void computerMove(){
         System.out.println("\n\nPretend the computer makes its move.\n");
     }
-
-    /*
-     * checkMoveValidity(char current_char, int[] move)
-     * checks whether the move entered is valid
-     * returns: boolean, true if valid, false otherwise
-     * args: char, int[]
-     */
-    public static boolean checkMoveValidity(char current_char, int[] move){
-        boolean validity = false;
-        return validity;
-    }
-
-    /*
-     * findChar(char toFind)
-     * finds the coordinates of the 
-
 
     
     /*

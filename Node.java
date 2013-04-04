@@ -330,19 +330,6 @@ public class Node implements Comparable{
         }
         System.out.println();
     }
-
-    /*
-     * checkMoveValidity(char current_char, int[] move)
-     * checks whether the move entered is valid
-     * returns: boolean, true if valid, false otherwise
-     * args: char, int[]
-     */
-    public static boolean checkMoveValidity(char current_char, int[] move){
-        boolean validity = false;
-
-        return validity;
-    }
-
      
     /*
      * printValidMoves()
