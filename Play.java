@@ -182,7 +182,7 @@ public class Play{
      */
     public static void computerMove(){
         long start_time;
-        System.out.println("\n\nPretend the computer makes its move.\n");
+        System.out.println("\n\nAlpha-Beta Score: " + alphaBetaSearch(root, 3));
     }
 
     /*
@@ -193,6 +193,7 @@ public class Play{
      * args: Node, char, char
      */
     public static int alphaBetaSearch(Node root, int depth_limit){
+        System.out.println("DEBUG: in alphabeta");
         int score = maxValue(root, neg_infinity, infinity, depth_limit);
         return score;
     }
@@ -203,10 +204,15 @@ public class Play{
     public static int maxValue(Node node, int alpha, int beta, int depth_limit){
         if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0)
             return node.evaluate();
+        
+        System.out.println("DEBUG: finished terminal check");
         int value = neg_infinity;
         Iterator itr = node.getValidMoves().iterator();
         while(itr.hasNext()){
+        System.out.println("DEBUG: iterating");
             Point move = (Point)itr.next();
+
+        System.out.println("DEBUG: Point: (" + (int)move.getX() + " " + (int)move.getY() + ")");
             Node child = new Node(node, move, node.getTurn());
             value = Math.max(value, minValue(child, alpha, beta, depth_limit));
             if (value >= beta)
