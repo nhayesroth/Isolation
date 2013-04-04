@@ -97,6 +97,7 @@ public class Play{
      *     if valid, prints resulting board and confirms the choice before carrying through
      */
     public static void readPlayerMove(){
+        int [] coordinates = root.findChar(player_char);
         int count = 0;
         System.out.println("\nPlease enter your next move.\n\tformat: (row column)\n");
         String str = "";
@@ -120,8 +121,10 @@ public class Play{
             String answer = yesNo();
             if (answer.equals("n"))
                 readPlayerMove();
-            else
+            else{
                 root.setState((current_move[0]-board_index),(current_move[1]-board_index),player_char);
+                root.setState(coordinates[0], coordinates[1], '*'); 
+            }
         }
     }
 
@@ -189,9 +192,17 @@ public class Play{
             computer_turn = true;
         else computer_turn = false;
         while(true){
-            if(computer_turn)
+            root.clearValidMoves();
+            if(computer_turn){
+                root.setValidMoves(computer_char);
+                System.out.println("Computer Moves:");
+                root.printValidMoves();
                 computerMove();
+            }
             else{
+                root.setValidMoves(player_char);
+                System.out.println("Player Moves:");
+                root.printValidMoves();
                 readPlayerMove();
                 root.printState();
                 if ((current_move[0] == 0) && (current_move[1] == 0))
@@ -201,15 +212,4 @@ public class Play{
         }
         System.out.println();
     }
-}
-
-
-        
-        
-    
-             
-    
-    
-    
-    
-    
+} 

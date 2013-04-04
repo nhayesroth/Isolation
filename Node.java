@@ -24,6 +24,7 @@ public class Node implements Comparable{
     /* class attributes */
     private Node parent;
     private char[][] state;
+    private char turn;
     private int depth;
     private Vector<Point> validMoves;
 
@@ -35,6 +36,7 @@ public class Node implements Comparable{
     public Node(){
         this.parent = null;
         this.state = new char[puzzle_size][puzzle_size];
+        this.turn = 'x';
         this.depth = 0;
         this.validMoves = new Vector<Point>();
     }
@@ -48,6 +50,10 @@ public class Node implements Comparable{
         this.parent = parent;
         this.state = parent.state;
         this.setState((int)moveTo.getX(), (int)moveTo.getY(), val);
+        if (parent.turn == 'x')
+            this.turn = 'o';
+        else 
+            this.turn = 'x';
         this.depth = parent.depth + 1;
         this.validMoves = this.getValidMoves();
     }
@@ -131,14 +137,88 @@ public class Node implements Comparable{
     public void setDepth(int d){
         this.depth = d;
     }
+
+    /*
+     * clearValidMoves()
+     * clears the validMoves vector
+     * returns: NA
+     * args: NA
+     */
+   public void clearValidMoves(){
+        this.validMoves = new Vector<Point>();
+   }
+
     
     /*
      * setValidMoves(char current_char)
-     * sets the validMoves() Vector with appropriate values;
+     * sets the validMoves Vector with appropriate values;
      * returns: NA
      * args: NA
      */
     public void setValidMoves(char current_char){
+        int limit; // to be used in diagonals
+        int [] coordinates = findChar(current_char); // location of current player's character
+        /* explore in all directions, adding moves as far as you can */
+        // up
+        for (int index = coordinates[0] + 1; index < puzzle_size; index++){
+            if (this.state[index][coordinates[1]] == '-')
+                this.validMoves.add(new Point(index, coordinates[1]));
+            else
+                break;
+        }
+        // down
+        for (int index = coordinates[0] - 1; index >= 0; index--){
+            if (this.state[index][coordinates[1]] == '-')
+                this.validMoves.add(new Point(index, coordinates[1]));
+            else
+                break;
+        }
+        // left
+        for (int index = coordinates[1] + 1; index < puzzle_size; index++){
+            if (this.state[coordinates[0]][index] == '-')
+                this.validMoves.add(new Point(coordinates[0], index));
+            else
+                break;
+        }
+        // right
+        for (int index = coordinates[1] - 1; index >= 0; index--){
+            if (this.state[coordinates[0]][index] == '-')
+                this.validMoves.add(new Point(coordinates[0], index));
+            else
+                break;
+        }
+        // up/left
+        if (coordinates[0] > coordinates[1])
+            limit = coordinates[1];
+        else limit = coordinates[0];
+        System.out.println("coordinates0: " + coordinates[0]);
+        System.out.println("coordinates1: " + coordinates[1]);
+        System.out.println("limit: " + limit);
+
+        for (int index = 1; index < limit; index++){
+            System.out.println("I'm about to die!!!!");
+            if (this.state[coordinates[0]-index][coordinates[1]-index] == '-'){
+                this.validMoves.add(new Point((coordinates[0]-index), (coordinates[1]-index)));
+                System.out.println("DEBUG: up/left added");
+            }
+            else
+                break;
+        }
+        // up/right
+
+        // down/left
+
+        // down/right
+
+    }
+
+   /*
+    * findChar(char current)
+    * returns the coordinates of current_char in this.state
+    * returns: int[2]
+    * args: char
+    */
+    public int[] findChar(char current_char){
         int[] coordinates = new int[2];
         // find the char
         for (int i = 0; i<puzzle_size; i++){
@@ -149,21 +229,10 @@ public class Node implements Comparable{
                 }
             }
         }
+        return coordinates;
+    }
 
-        // generate horizontal
-        for (int index = -coordinates[0]; index<puzzle_size; index++){
-            if (coordinates[0] != index)
-                this.validMoves.add(new Point(index, coordinates[1]));
-        }
 
-        // generate vertical
-        
-
-        // generate DL-UR
-        
-
-        // generate UL-DR
-    } 
     
      
     /*
