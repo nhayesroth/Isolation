@@ -37,13 +37,16 @@ public class Play{
     public static char computer_char; // character for computer player
     public static char player_char; // character for the human player
     public static char[][] board = new char[Node.puzzle_size][Node.puzzle_size]; //current board
-    public static int time_limit; // time limit for moves
+    public static long time_limit; // time limit for moves
+    static long start_time = 0;
+    static long elapsed_time = 0;
     public static char current_player; // indicates which player's turn it is
     public static int[] current_move = new int[2]; // coordinates of current move
     public static boolean computer_turn; // indicates if it is the computer's turn to move
     static int[] best_move = new int[2]; // will hold the best move for the computer
     static Vector<Node> children = new Vector<Node>(); // will hold root successors
-    static int depth;
+    static int depth = 6; // the maximum depth limit that will be searched, set by time_limit
+    static int round = 1; // indicates how many rounds of turns have processed
     
     /*
      * fillBoard(Point xStart, Point oStart)
@@ -95,20 +98,15 @@ public class Play{
             }
         }
         System.out.println("\nAlright, and how many seconds should it spend making each move?");
-        int time_limit;
         try {
             BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
             choice = br.readLine();
         } catch (Exception e) {
             System.out.println("Exception: " + e);
         }
-        time_limit = Integer.parseInt(choice);
-        if(time_limit>50)
-            depth = 5;
-        else depth = 4;
-        System.out.println("DEPTH: " + depth);        
-        System.out.println("TIME_LIMIT: " + time_limit);        
-        System.out.println("\nGot it, each move will take, at most, "+time_limit+" seconds.\n");
+        time_limit = Long.parseLong(choice);
+        System.out.println("\nGot it, each move will take, at most, " +
+                           (int)time_limit+" seconds.\n");
     }
     
     /*
@@ -143,13 +141,17 @@ public class Play{
             if (answer.equals("n"))
                 readPlayerMove();
             else{
-                Point to_check = new Point(current_move[0]-board_index, current_move[1]-board_index);
+                Point to_check = new Point(current_move[0]-board_index, 
+                                           current_move[1]-board_index);
                 if (root.getValidMoves().contains(to_check)){
-                    root.setState((current_move[0]-board_index),(current_move[1]-board_index),player_char);
+                    root.setState(current_move[0]-board_index,
+                                  current_move[1]-board_index,
+                                  player_char);
                     root.setState(coordinates[0], coordinates[1], '*');
                 }
                 else {
-                   System.out.println("\nSorry, but that's an invalid move. I told you I'd win, sucka.\n");
+                   System.out.println("\nSorry, but that's an invalid move. " + 
+                                      "I told you I'd win, sucka.\n");
                    System.exit(0);
                 } 
             }
@@ -188,25 +190,23 @@ public class Play{
      * args: NA
      */
     public static void computerMove(){
+        start_time = System.nanoTime();
         children.clear();
         int score = alphaBetaSearch(root, depth);
         if (children.size() == 0){
             System.out.println("(nil nil)");
             System.exit(0);
         }
-        System.out.println("\n\nAlpha-Beta Score: " + score);
         Iterator itr = children.iterator();
-        System.out.println("DEBUG: done searching, about to check all successors...");
         while(itr.hasNext()){
             Node child = (Node)itr.next();
-            System.out.print("\nDEBUG: successor: (" + child.findChar(computer_char)[0] + " " + child.findChar(computer_char)[1] + ")");
-            System.out.print("-- score: child.value " + child.value);
             if (child.value == score){
                 best_move = child.findChar(computer_char);
                 break;
             }
         }
-        System.out.println("\n\nMove: (" + (best_move[0]+board_index) + " " + (best_move[1]+board_index) + ")");
+        System.out.println("\n\nMove: (" + (best_move[0]+board_index) + 
+                           " " + (best_move[1]+board_index) + ")\n");
         int[] old_coord = root.findChar(computer_char);
         board[best_move[0]][best_move[1]] = computer_char;
         board[old_coord[0]][old_coord[1]] = '*';
@@ -226,20 +226,25 @@ public class Play{
 
     /*
      * maxValue(Node node, int alpha, int beta, int depth_limit)
+     * returns the value of a MAX node, ie the computer player
+     * helper function for alphaBetaSearch
+     * returns: int
+     * args: Node, int, int, int
      */
     public static int maxValue(Node node, int alpha, int beta, int depth_limit){
-        if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0){
+        elapsed_time = (System.nanoTime() - start_time)/1000000000;
+        if (node.getDepth() >= depth_limit || 
+            node.getValidMoves().size() == 0 || 
+            elapsed_time >= .95*time_limit){
             //best_move = node.findChar(node.getTurn());
             return node.evaluate();
         }
-        
         int value = neg_infinity;
         Iterator itr = node.getValidMoves().iterator();
         while(itr.hasNext()){
             Point move = (Point)itr.next();
             Node child = new Node(node, move, node.getTurn());
             children.add(child);
-            System.out.println("DEBUG - child ("+(int)move.getX()+" "+(int)move.getY()+")");
             value = Math.max(value, minValue(child, alpha, beta, depth_limit));
             child.value = value;
             if (value >= beta){
@@ -253,17 +258,21 @@ public class Play{
             Node current = (Node)itr.next();
 
             int[] coord = current.findChar(node.getTurn());
-            System.out.println("NEW DEBUG ("+coord[0]+" "+coord[1]+")");
         }
-
         return value;
     }
 
     /*
      * minValue(Node node, int alpha, int beta, int depth_limit)
+     * returns the value of a MIN node, ie the human opponent
+     * returns: int
+     * args: Node, int, int, int
      */
     public static int minValue(Node node, int alpha, int beta, int depth_limit){
-        if (node.getDepth() >= depth_limit || node.getValidMoves().size() == 0){
+        elapsed_time = (System.nanoTime() - start_time)/1000000000;
+        if (node.getDepth() >= depth_limit || 
+            node.getValidMoves().size() == 0 || 
+            elapsed_time > .95*time_limit){
             //best_move = node.findChar(node.getTurn());
             return node.evaluate();
         }
@@ -288,30 +297,39 @@ public class Play{
      * administers the program
      */
     public static void main(String [] args){
+        // pre-game setup
         fillBoard();
         root.setState(board);
         intro();
         if (computer_char == 'x')
             computer_turn = true;
         else computer_turn = false;
+        root.printState();
         while(true){
+            // increase the depth of search every 5 turns
+            if(round/5 == 2){
+                depth++;
+                round = 1;
+            }
             root.clearValidMoves();
+            // computer's turn
             if(computer_turn){
                 root.setTurn(computer_char);
                 root.validMoves = root.setValidMoves();
-                //root.setValidMoves(computer_char);
                 computerMove();
                 root.setState(board);
                 root.printState();
+                round++;
             }
+            // human's turn
             else{
-                //root.setValidMoves(player_char);
                 root.setTurn(player_char);
                 root.validMoves = root.setValidMoves();
                 readPlayerMove();
                 root.printState();
                 if ((current_move[0] == 0) && (current_move[1] == 0))
                     break;
+                round++;
             }
             computer_turn = !computer_turn;
         }

@@ -368,6 +368,12 @@ public class Node implements Comparable{
      * args: NA
      */
     public int evaluate(){
+        /* multipliers */
+        int X = 3;
+        int Y = 1;
+        int Z = 3;
+        int W = 2;
+
         char that_char = 'x';
         if (this.turn == 'x')
             that_char = 'o';
@@ -375,23 +381,32 @@ public class Node implements Comparable{
         int that_row = this.findChar(that_char)[0];
         int this_col = this.findChar(this.turn)[1];
         int that_col = this.findChar(that_char)[1];
-        // start with 2 times the number of valid moves
-        int score = 2*this.validMoves.size();
-        //subtract the number of opponent's valid moves
-        score = score - this.opponentValidMoves(that_char);
-        // subtract 1 for each wall it's next to
-        if (this.findChar(this.turn)[0] == 0 || this.findChar(this.turn)[0] == puzzle_size-1)
-            score--;
-        // subtract 1 for each surrounding cell that is filled
+        // start with X times the number of valid moves
+        int score = X*this.validMoves.size();
+        //subtract Y times the number of opponent's valid moves
+        score = score - Y*this.opponentValidMoves(that_char);
+        // subtract 10 for each wall it's next to
+        if (this_row == 0 || this_row == puzzle_size-1)
+            score = score - 10;
+        if (this_col == 0 || this_col == puzzle_size-1)
+            score = score = 10;
+        // subtract Z for each surrounding cell that is filled
+        // add Z for each cell surrounding the oppenent that is filled
         for (int i = -1; i<=1; i++){
             for (int j = -1; j<1; j++){
-                if (i>=0 && i<=puzzle_size-1 && j>=0 && j<=puzzle_size-1){
-                    if (this.state[i][j] != '-')
-                        score--;
+                if (i+this_row>=0 && i+this_row<=puzzle_size-1 && 
+                    j+this_col>=0 && j+this_col<=puzzle_size-1){
+                    if (this.state[this_row+i][this_col+j] != '-')
+                        score = score - Z;
                 }
+                if (i+that_row>=0 && i+that_row<=puzzle_size-1 && 
+                    j+that_col>=0 && j+that_col<=puzzle_size-1){
+                    if (this.state[that_row+i][that_col+j] != '-')
+                        score = score + Z;
+                }
+
             }
         }
-        // add 3 for each filled cell surrounding the oponent's char
 
         this.value = score;
         return this.value;
